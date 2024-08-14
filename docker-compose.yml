@@ -1,0 +1,15 @@
+version: '1'
+services:
+  user-gateway:
+    build: ./packages/apps/ics-server-api-gateway/user-gateway
+    ports:
+      - "3001:3000"  # 将主机的3001端口映射到容器的3000端口
+    environment:
+      - NODE_ENV=production
+
+  admin-gateway:
+    build: ./packages/apps/ics-server-api-gateway/admin-gateway
+    ports:
+      - "3002:3000"  # 将主机的3002端口映射到容器的3000端口
+    environment:
+      - NODE_ENV=production
