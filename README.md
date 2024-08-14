@@ -8,6 +8,7 @@
 ```
 ics-server/
 │
+├── .github/                         # GitHub工作流目录
 ├── packages/                        # 所有包的根目录
 │   ├── apps/                        # 应用程序和业务服务
 │   │   ├── ics-server-api-gateway/  # API Gateway，处理所有外部请求的入口
