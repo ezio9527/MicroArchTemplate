@@ -27,6 +27,10 @@ jobs:
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
+      - name: Set environment variables
+        run: |
+          export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
+
       - name: Build and push Docker images using Docker Compose
         run: |
           docker-compose build
