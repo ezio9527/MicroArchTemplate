@@ -27,11 +27,20 @@ jobs:
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Build and start services using Docker Compose
-        run: docker-compose up --build -d
+      - name: Build Docker images using Docker Compose
+        run: docker-compose build
 
-      - name: Push Docker image to Docker Hub
-        run: docker-compose push
+      - name: Tag user-gateway image
+        run: docker tag microarchtemplate-user-gateway:latest ${{ secrets.DOCKER_USERNAME }}/user-gateway:latest
+
+      - name: Tag admin-gateway image
+        run: docker tag microarchtemplate-admin-gateway:latest ${{ secrets.DOCKER_USERNAME }}/admin-gateway:latest
+
+      - name: Push user-gateway image to Docker Hub
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/user-gateway:latest
+
+      - name: Push admin-gateway image to Docker Hub
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/admin-gateway:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -46,4 +55,5 @@ jobs:
       - name: Deploy to production server
         run: |
           echo "Deploying to production server..."
-          ssh -o StrictHostKeyChecking=no root@155.94.204.39 "docker pull hzl277341642/ics-server-user-gateway:latest && docker stop ics-server-user-gateway && docker rm ics-server-user-gateway && docker run -d --name ics-server-user-gateway -p 3001:3000 hzl277341642/ics-server-user-gateway:latest"
+          ssh -o StrictHostKeyChecking=no root@155.94.204.39 "docker pull ${{ secrets.DOCKER_USERNAME }}/user-gateway:latest && docker stop ics-server-user-gateway && docker rm ics-server-user-gateway && docker run -d --name ics-server-user-gateway -p 3001:3000 ${{ secrets.DOCKER_USERNAME }}/user-gateway:latest"
+          ssh -o StrictHostKeyChecking=no root@155.94.​⬤
