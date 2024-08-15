@@ -50,10 +50,16 @@ jobs:
           echo "  StrictHostKeyChecking no" >> ~/.ssh/config
           echo "  UserKnownHostsFile=/dev/null" >> ~/.ssh/config
 
+      - name: Clone repository on production server
+        run: |
+          echo "Cloning repository on production server..."
+          ssh ${{ secrets.USER }}@${{ secrets.HOST }} "git clone -b main ${{ secrets.REPOSITORY_URL }} ${{ secrets.PROJECT_PATH }} || (cd ${{ secrets.PROJECT_PATH }} && git pull)"
+
       - name: Pull and deploy Docker images on production server
         run: |
           echo "Pulling and deploying to production server..."
           ssh ${{ secrets.USER }}@${{ secrets.HOST }} << EOF
+            cd ${{ secrets.PROJECT_PATH }}
             docker-compose pull
             if [ \$(docker ps -q -f name=user-gateway) ]; then docker stop user-gateway && docker rm user-gateway; fi
             if [ \$(docker ps -q -f name=admin-gateway) ]; then docker stop admin-gateway && docker rm admin-gateway; fi
