@@ -55,5 +55,7 @@ jobs:
       - name: Deploy to production server
         run: |
           echo "Deploying to production server..."
-          ssh -o StrictHostKeyChecking=no root@155.94.204.39 "docker pull ${{ secrets.DOCKER_USERNAME }}/user-gateway:latest && docker stop ics-server-user-gateway && docker rm ics-server-user-gateway && docker run -d --name ics-server-user-gateway -p 3001:3000 ${{ secrets.DOCKER_USERNAME }}/user-gateway:latest"
-          ssh -o StrictHostKeyChecking=no root@155.94.​⬤
+          if [ $(docker ps -q -f name=user-gateway) ]; then docker stop user-gateway && docker rm user-gateway; fi
+          if [ $(docker ps -q -f name=admin-gateway) ]; then docker stop admin-gateway && docker rm admin-gateway; fi
+          ssh -o StrictHostKeyChecking=no root@155.94.204.39 "docker pull ${{ secrets.DOCKER_USERNAME }}/user-gateway:latest && docker stop user-gateway && docker rm user-gateway && docker run -d --name user-gateway -p 3001:3000 ${{ secrets.DOCKER_USERNAME }}/user-gateway:latest"
+          ssh -o StrictHostKeyChecking=no root@155.94.204.39 "docker pull ${{ secrets.DOCKER_USERNAME }}/admin-gateway:latest && docker stop admin-gateway && docker rm admin-gateway && docker run -d --name user-gateway -p 3002:3000 ${{ secrets.DOCKER_USERNAME }}/admin-gateway:latest"
