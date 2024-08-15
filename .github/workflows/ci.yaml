@@ -52,12 +52,12 @@ jobs:
 
       - name: Clone or update repository on production server
         run: |
-          echo "Cloning or updating repository:${{ secrets.GITHUB_REPOSITORY_URL }} on production server..."
+          echo "Cloning or updating repository:${{ secrets.REPOSITORY_URL }} on production server..."
           ssh ${{ secrets.USER }}@${{ secrets.HOST }} << EOF
             if [ -d "${{ secrets.PROJECT_PATH }}/.git" ]; then
               cd ${{ secrets.PROJECT_PATH }} && git pull
             else
-              rm -rf ${{ secrets.PROJECT_PATH }} && git clone -b main ${{ secrets.GITHUB_REPOSITORY_URL }} ${{ secrets.PROJECT_PATH }}
+              rm -rf ${{ secrets.PROJECT_PATH }} && git clone -b main ${{ secrets.REPOSITORY_URL }} ${{ secrets.PROJECT_PATH }}
             fi
           EOF
 
