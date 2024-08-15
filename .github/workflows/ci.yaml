@@ -28,8 +28,6 @@ jobs:
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build and push Docker images using Docker Compose
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         run: |
           docker-compose build
           docker-compose push
@@ -54,10 +52,10 @@ jobs:
         run: |
           echo "Cloning or updating repository:${{ secrets.REPOSITORY_URL }} on production server..."
           ssh ${{ secrets.USER }}@${{ secrets.HOST }} << EOF
-            if [ -d "${{ secrets.PROJECT_PATH }}/.git" ]; then
-              cd ${{ secrets.PROJECT_PATH }} && git pull
+            if [ -d "/var/www/yourproject/.git" ]; then
+              cd /var/www/yourproject && git pull
             else
-              rm -rf ${{ secrets.PROJECT_PATH }} && git clone -b main ${{ secrets.REPOSITORY_URL }} ${{ secrets.PROJECT_PATH }}
+              rm -rf /var/www/yourproject && git clone -b main ${{ secrets.REPOSITORY_URL }} /var/www/yourproject
             fi
           EOF
 
@@ -65,7 +63,7 @@ jobs:
         run: |
           echo "Pulling and deploying to production server..."
           ssh ${{ secrets.USER }}@${{ secrets.HOST }} << EOF
-            cd ${{ secrets.PROJECT_PATH }}
+            cd /var/www/yourproject
             docker-compose pull
             if [ \$(docker ps -q -f name=user-gateway) ]; then docker stop user-gateway && docker rm user-gateway; fi
             if [ \$(docker ps -q -f name=admin-gateway) ]; then docker stop admin-gateway && docker rm admin-gateway; fi
