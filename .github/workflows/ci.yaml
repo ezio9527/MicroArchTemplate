@@ -52,7 +52,7 @@ jobs:
 
       - name: Clone or update repository on production server
         run: |
-          echo "Cloning or updating repository on production server..."
+          echo "Cloning or updating repository:${{ secrets.GITHUB_REPOSITORY_URL }} on production server..."
           ssh ${{ secrets.USER }}@${{ secrets.HOST }} << EOF
             if [ -d "${{ secrets.PROJECT_PATH }}/.git" ]; then
               cd ${{ secrets.PROJECT_PATH }} && git pull
