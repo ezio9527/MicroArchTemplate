@@ -52,10 +52,23 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Disable StrictHostKeyChecking and Setup SSH Config
+        run: |
+          echo "Host 155.94.204.39" >> ~/.ssh/config
+          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+          echo "  UserKnownHostsFile=/dev/null" >> ~/.ssh/config
+
+      - name: Pull Docker images on production server
+        run: |
+          ssh root@155.94.204.39 "docker pull ${{ secrets.DOCKER_USERNAME }}/user-gateway:latest"
+          ssh root@155.94.204.39 "docker pull ${{ secrets.DOCKER_USERNAME }}/admin-gateway:latest"
+
       - name: Deploy to production server
         run: |
           echo "Deploying to production server..."
-          if [ $(docker ps -q -f name=user-gateway) ]; then docker stop user-gateway && docker rm user-gateway; fi
-          if [ $(docker ps -q -f name=admin-gateway) ]; then docker stop admin-gateway && docker rm admin-gateway; fi
-          ssh -o StrictHostKeyChecking=no root@155.94.204.39 "docker pull ${{ secrets.DOCKER_USERNAME }}/user-gateway:latest && docker run -d --name user-gateway -p 3001:3000 ${{ secrets.DOCKER_USERNAME }}/user-gateway:latest"
-          ssh -o StrictHostKeyChecking=no root@155.94.204.39 "docker pull ${{ secrets.DOCKER_USERNAME }}/admin-gateway:latest && docker run -d --name user-gateway -p 3002:3000 ${{ secrets.DOCKER_USERNAME }}/admin-gateway:latest"
+          ssh root@155.94.204.39 << EOF
+            if [ \$(docker ps -q -f name=user-gateway) ]; then docker stop user-gateway && docker rm user-gateway; fi
+            if [ \$(docker ps -q -f name=admin-gateway) ]; then docker stop admin-gateway && docker rm admin-gateway; fi
+            docker run -d --name user-gateway -p 3001:3000 ${{ secrets.DOCKER_USERNAME }}/user-gateway:latest
+            docker run -d --name admin-gateway -p 3002:3000 ${{ secrets.DOCKER_USERNAME }}/admin-gateway:latest
+          EOF
